@@ -2,7 +2,7 @@
 
 [package]
 # Pseudo-package whose dependencies are imported and buckified
-name = "rust-third-party"
+name = "rust-library"
 version = "0.0.0"
 edition = "2021"
 publish = false
