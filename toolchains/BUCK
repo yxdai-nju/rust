@@ -1,0 +1,43 @@
+load("@prelude//toolchains:cxx.bzl", "system_cxx_toolchain")
+load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain")
+load(":rust_toolchain.bzl", "custom_rust_toolchain")
+
+system_cxx_toolchain(
+    name = "cxx",
+    visibility = ["PUBLIC"],
+)
+
+system_python_bootstrap_toolchain(
+    name = "python_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+toolchain_alias(
+    name = "rust",
+    actual = select({
+        "DEFAULT": ":stage0_rust_toolchain",
+        "bootstrap//:stage0": ":stage0_rust_toolchain",
+        # "bootstrap//:stage1": ":stage1_rust_toolchain",
+        # "bootstrap//:stage2": ":stage2_rust_toolchain",
+    }),
+    visibility = ["PUBLIC"],
+)
+
+custom_rust_toolchain(
+    name = "stage0_rust_toolchain",
+    # TODO(yxdai-nju): avoid hard-coding path within devcontainer
+    sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage0",
+    default_edition = "2021",
+)
+
+# custom_rust_toolchain(
+#     name = "stage1_rust_toolchain",
+#     sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage1",
+#     default_edition = "2021",
+# )
+
+# custom_rust_toolchain(
+#     name = "stage2_rust_toolchain",
+#     sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage2",
+#     default_edition = "2021",
+# )

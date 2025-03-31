@@ -1,0 +1,27 @@
+[cells]
+root = .
+prelude = prelude
+toolchains = toolchains
+bootstrap = bootstrap
+none = none
+
+[cell_aliases]
+config = prelude
+ovr_config = prelude
+fbcode = none
+fbsource = none
+fbcode_macros = none
+buck = none
+
+[external_cells]
+prelude = bundled
+
+[parser]
+target_platform_detector_spec = target:root//...->bootstrap//platforms:stage0
+
+; TODO(yxdai-nju): figure out what the following configuration means
+; [build]
+; execution_platforms = prelude//platforms:default
+
+[project]
+ignore = .git, build, target
