@@ -3,5 +3,12 @@
 version = 4
 
 [[package]]
+name = "core"
+version = "0.0.0"
+
+[[package]]
 name = "rust-stdlib"
 version = "0.0.0"
+dependencies = [
+ "core",
+]

@@ -4,7 +4,7 @@
 # Pseudo-package whose dependencies are imported and buckified
 name = "rust-stdlib"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 # Dummy target to keep Cargo happy
@@ -15,6 +15,7 @@ path = "top/main.rs"
 # List of packages to be imported, with version constraints, features
 # and all options Cargo supports.
 [dependencies]
+core = { path = "src/core" }
 
 # Local patches - typically git references
 [patch.crates-io]

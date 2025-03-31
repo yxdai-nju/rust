@@ -27,17 +27,17 @@ custom_rust_toolchain(
     name = "stage0_rust_toolchain",
     # TODO(yxdai-nju): avoid hard-coding path within devcontainer
     sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage0",
-    default_edition = "2021",
+    default_edition = "2024",
 )
 
 # custom_rust_toolchain(
 #     name = "stage1_rust_toolchain",
 #     sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage1",
-#     default_edition = "2021",
+#     default_edition = "2024",
 # )
 
 # custom_rust_toolchain(
 #     name = "stage2_rust_toolchain",
 #     sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage2",
-#     default_edition = "2021",
+#     default_edition = "2024",
 # )
