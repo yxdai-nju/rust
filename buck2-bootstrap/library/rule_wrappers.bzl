@@ -2,11 +2,11 @@ load("@prelude//rust:cargo_package.bzl", "cargo")
 
 _STAGE0_RUSTC_FLAGS = [
     "--cfg=bootstrap",
-    "--check-cfg=values(bootstrap)",
+    "--check-cfg=cfg(bootstrap)",
 ]
 
 _ADDITIONAL_RUSTC_FLAGS = [
-    "opt-level=3",
+    "-Copt-level=3",
 ]
 
 _RUSTC_FLAGS = select({
