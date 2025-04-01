@@ -1,0 +1,29 @@
+load("@prelude//platforms:defs.bzl", "execution_platform", "host_configuration")
+
+execution_platform(
+    name = "default",
+    cpu_configuration = host_configuration.cpu,
+    os_configuration = host_configuration.os,
+    use_windows_path_separators = host_info().os.is_windows,
+)
+
+platform(
+    name = "stage0",
+    constraint_values = ["bootstrap//:stage0"],
+    deps = [":default"],
+    visibility = ["PUBLIC"],
+)
+
+platform(
+    name = "stage1",
+    constraint_values = ["bootstrap//:stage1"],
+    deps = [":default"],
+    visibility = ["PUBLIC"],
+)
+
+platform(
+    name = "stage2",
+    constraint_values = ["bootstrap//:stage2"],
+    deps = [":default"],
+    visibility = ["PUBLIC"],
+)

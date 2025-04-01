@@ -1,0 +1,26 @@
+{
+    "name": "Rust Development",
+    "build": {
+        "dockerfile": "./Dockerfile",
+        "args": {
+            "USERNAME": "rust", // Used for creating "/home/$USERNAME" directory within container
+            "USER_UID": "1000"
+        }
+    },
+    "workspaceFolder": "/workdir",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workdir,type=bind",
+    "mounts": [],
+    "remoteUser": "rust",
+    // Configure tool-specific properties.
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bazelbuild.vscode-bazel",
+                "ms-python.python",
+                "rust-lang.rust-analyzer@prerelease",
+                "saoudrizwan.claude-dev",
+                "tamasfe.even-better-toml"
+            ]
+        }
+    }
+}
