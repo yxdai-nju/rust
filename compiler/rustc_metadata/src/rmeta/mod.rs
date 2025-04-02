@@ -36,7 +36,7 @@ use rustc_serialize::opaque::FileEncoder;
 use rustc_session::config::{SymbolManglingVersion, TargetModifier};
 use rustc_session::cstore::{CrateDepKind, ForeignModule, LinkagePreference, NativeLib};
 use rustc_span::edition::Edition;
-use rustc_span::hygiene::{ExpnIndex, MacroKind, SyntaxContextKey};
+use rustc_span::hygiene::{ExpnIndex, MacroKind, SyntaxContextData};
 use rustc_span::{self, ExpnData, ExpnHash, ExpnId, Ident, Span, Symbol};
 use rustc_target::spec::{PanicStrategy, TargetTuple};
 use table::TableBuilder;
@@ -56,7 +56,7 @@ pub(crate) fn rustc_version(cfg_version: &'static str) -> String {
 /// Metadata encoding version.
 /// N.B., increment this if you change the format of metadata such that
 /// the rustc version can't be found to compare with `rustc_version()`.
-const METADATA_VERSION: u8 = 9;
+const METADATA_VERSION: u8 = 10;
 
 /// Metadata header which includes `METADATA_VERSION`.
 ///
@@ -193,7 +193,7 @@ enum LazyState {
     Previous(NonZero<usize>),
 }
 
-type SyntaxContextTable = LazyTable<u32, Option<LazyValue<SyntaxContextKey>>>;
+type SyntaxContextTable = LazyTable<u32, Option<LazyValue<SyntaxContextData>>>;
 type ExpnDataTable = LazyTable<ExpnIndex, Option<LazyValue<ExpnData>>>;
 type ExpnHashTable = LazyTable<ExpnIndex, Option<LazyValue<ExpnHash>>>;
 
@@ -221,6 +221,12 @@ pub(crate) struct CrateHeader {
     /// This is separate from [`ProcMacroData`] to avoid having to update [`METADATA_VERSION`] every
     /// time ProcMacroData changes.
     pub(crate) is_proc_macro_crate: bool,
+    /// Whether this crate metadata section is just a stub.
+    /// Stubs do not contain the full metadata (it will be typically stored
+    /// in a separate rmeta file).
+    ///
+    /// This is used inside rlibs and dylibs when using `-Zembed-metadata=no`.
+    pub(crate) is_stub: bool,
 }
 
 /// Serialized `.rmeta` data for a crate.
