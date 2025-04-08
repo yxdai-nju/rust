@@ -6,9 +6,8 @@ use rustc_ast_ir::Mutability;
 #[cfg(feature = "nightly")]
 use rustc_data_structures::stable_hasher::{HashStable, StableHasher};
 #[cfg(feature = "nightly")]
-use rustc_data_structures::unify::{NoError, UnifyKey, UnifyValue};
-#[cfg(feature = "nightly")]
 use rustc_macros::{Decodable_NoContext, Encodable_NoContext, HashStable_NoContext};
+use rustc_type_ir::data_structures::{NoError, UnifyKey, UnifyValue};
 use rustc_type_ir_macros::{Lift_Generic, TypeFoldable_Generic, TypeVisitable_Generic};
 
 use self::TyKind::*;
@@ -271,6 +270,68 @@ pub enum TyKind<I: Interner> {
     /// A placeholder for a type which could not be computed; this is
     /// propagated to avoid useless error messages.
     Error(I::ErrorGuaranteed),
+}
+
+impl<I: Interner> TyKind<I> {
+    pub fn fn_sig(self, interner: I) -> ty::Binder<I, ty::FnSig<I>> {
+        match self {
+            ty::FnPtr(sig_tys, hdr) => sig_tys.with(hdr),
+            ty::FnDef(def_id, args) => interner.fn_sig(def_id).instantiate(interner, args),
+            ty::Error(_) => {
+                // ignore errors (#54954)
+                ty::Binder::dummy(ty::FnSig {
+                    inputs_and_output: Default::default(),
+                    c_variadic: false,
+                    safety: I::Safety::safe(),
+                    abi: I::Abi::rust(),
+                })
+            }
+            ty::Closure(..) => panic!(
+                "to get the signature of a closure, use `args.as_closure().sig()` not `fn_sig()`",
+            ),
+            _ => panic!("Ty::fn_sig() called on non-fn type: {:?}", self),
+        }
+    }
+
+    /// Returns `true` when the outermost type cannot be further normalized,
+    /// resolved, or instantiated. This includes all primitive types, but also
+    /// things like ADTs and trait objects, since even if their arguments or
+    /// nested types may be further simplified, the outermost [`ty::TyKind`] or
+    /// type constructor remains the same.
+    pub fn is_known_rigid(self) -> bool {
+        match self {
+            ty::Bool
+            | ty::Char
+            | ty::Int(_)
+            | ty::Uint(_)
+            | ty::Float(_)
+            | ty::Adt(_, _)
+            | ty::Foreign(_)
+            | ty::Str
+            | ty::Array(_, _)
+            | ty::Pat(_, _)
+            | ty::Slice(_)
+            | ty::RawPtr(_, _)
+            | ty::Ref(_, _, _)
+            | ty::FnDef(_, _)
+            | ty::FnPtr(..)
+            | ty::UnsafeBinder(_)
+            | ty::Dynamic(_, _, _)
+            | ty::Closure(_, _)
+            | ty::CoroutineClosure(_, _)
+            | ty::Coroutine(_, _)
+            | ty::CoroutineWitness(..)
+            | ty::Never
+            | ty::Tuple(_) => true,
+
+            ty::Error(_)
+            | ty::Infer(_)
+            | ty::Alias(_, _)
+            | ty::Param(_)
+            | ty::Bound(_, _)
+            | ty::Placeholder(_) => false,
+        }
+    }
 }
 
 // This is manually implemented because a derive would require `I: Debug`
@@ -734,7 +795,6 @@ pub enum InferTy {
 
 /// Raw `TyVid` are used as the unification key for `sub_relations`;
 /// they carry no values.
-#[cfg(feature = "nightly")]
 impl UnifyKey for TyVid {
     type Value = ();
     #[inline]
@@ -750,7 +810,6 @@ impl UnifyKey for TyVid {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl UnifyValue for IntVarValue {
     type Error = NoError;
 
@@ -770,7 +829,6 @@ impl UnifyValue for IntVarValue {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl UnifyKey for IntVid {
     type Value = IntVarValue;
     #[inline] // make this function eligible for inlining - it is quite hot.
@@ -786,7 +844,6 @@ impl UnifyKey for IntVid {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl UnifyValue for FloatVarValue {
     type Error = NoError;
 
@@ -804,7 +861,6 @@ impl UnifyValue for FloatVarValue {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl UnifyKey for FloatVid {
     type Value = FloatVarValue;
     #[inline]

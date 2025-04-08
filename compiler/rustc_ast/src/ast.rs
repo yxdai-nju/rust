@@ -563,6 +563,7 @@ impl Pat {
     /// This is intended for use by diagnostics.
     pub fn to_ty(&self) -> Option<P<Ty>> {
         let kind = match &self.kind {
+            PatKind::Missing => unreachable!(),
             // In a type expression `_` is an inference variable.
             PatKind::Wild => TyKind::Infer,
             // An IDENT pattern with no binding mode would be valid as path to a type. E.g. `u32`.
@@ -625,7 +626,8 @@ impl Pat {
             | PatKind::Guard(s, _) => s.walk(it),
 
             // These patterns do not contain subpatterns, skip.
-            PatKind::Wild
+            PatKind::Missing
+            | PatKind::Wild
             | PatKind::Rest
             | PatKind::Never
             | PatKind::Expr(_)
@@ -676,6 +678,7 @@ impl Pat {
     /// Return a name suitable for diagnostics.
     pub fn descr(&self) -> Option<String> {
         match &self.kind {
+            PatKind::Missing => unreachable!(),
             PatKind::Wild => Some("_".to_string()),
             PatKind::Ident(BindingMode::NONE, ident, None) => Some(format!("{ident}")),
             PatKind::Ref(pat, mutbl) => pat.descr().map(|d| format!("&{}{d}", mutbl.prefix_str())),
@@ -769,6 +772,9 @@ pub enum RangeSyntax {
 // Adding a new variant? Please update `test_pat` in `tests/ui/macros/stringify.rs`.
 #[derive(Clone, Encodable, Decodable, Debug)]
 pub enum PatKind {
+    /// A missing pattern, e.g. for an anonymous param in a bare fn like `fn f(u32)`.
+    Missing,
+
     /// Represents a wildcard pattern (`_`).
     Wild,
 
@@ -981,6 +987,75 @@ impl BinOpKind {
 
 pub type BinOp = Spanned<BinOpKind>;
 
+// Sometimes `BinOpKind` and `AssignOpKind` need the same treatment. The
+// operations covered by `AssignOpKind` are a subset of those covered by
+// `BinOpKind`, so it makes sense to convert `AssignOpKind` to `BinOpKind`.
+impl From<AssignOpKind> for BinOpKind {
+    fn from(op: AssignOpKind) -> BinOpKind {
+        match op {
+            AssignOpKind::AddAssign => BinOpKind::Add,
+            AssignOpKind::SubAssign => BinOpKind::Sub,
+            AssignOpKind::MulAssign => BinOpKind::Mul,
+            AssignOpKind::DivAssign => BinOpKind::Div,
+            AssignOpKind::RemAssign => BinOpKind::Rem,
+            AssignOpKind::BitXorAssign => BinOpKind::BitXor,
+            AssignOpKind::BitAndAssign => BinOpKind::BitAnd,
+            AssignOpKind::BitOrAssign => BinOpKind::BitOr,
+            AssignOpKind::ShlAssign => BinOpKind::Shl,
+            AssignOpKind::ShrAssign => BinOpKind::Shr,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Encodable, Decodable, HashStable_Generic)]
+pub enum AssignOpKind {
+    /// The `+=` operator (addition)
+    AddAssign,
+    /// The `-=` operator (subtraction)
+    SubAssign,
+    /// The `*=` operator (multiplication)
+    MulAssign,
+    /// The `/=` operator (division)
+    DivAssign,
+    /// The `%=` operator (modulus)
+    RemAssign,
+    /// The `^=` operator (bitwise xor)
+    BitXorAssign,
+    /// The `&=` operator (bitwise and)
+    BitAndAssign,
+    /// The `|=` operator (bitwise or)
+    BitOrAssign,
+    /// The `<<=` operator (shift left)
+    ShlAssign,
+    /// The `>>=` operator (shift right)
+    ShrAssign,
+}
+
+impl AssignOpKind {
+    pub fn as_str(&self) -> &'static str {
+        use AssignOpKind::*;
+        match self {
+            AddAssign => "+=",
+            SubAssign => "-=",
+            MulAssign => "*=",
+            DivAssign => "/=",
+            RemAssign => "%=",
+            BitXorAssign => "^=",
+            BitAndAssign => "&=",
+            BitOrAssign => "|=",
+            ShlAssign => "<<=",
+            ShrAssign => ">>=",
+        }
+    }
+
+    /// AssignOps are always by value.
+    pub fn is_by_value(self) -> bool {
+        true
+    }
+}
+
+pub type AssignOp = Spanned<AssignOpKind>;
+
 /// Unary operator.
 ///
 /// Note that `&data` is not an operator, it's an `AddrOf` expression.
@@ -1100,6 +1175,7 @@ pub enum MacStmtStyle {
 #[derive(Clone, Encodable, Decodable, Debug)]
 pub struct Local {
     pub id: NodeId,
+    pub super_: Option<Span>,
     pub pat: P<Pat>,
     pub ty: Option<P<Ty>>,
     pub kind: LocalKind,
@@ -1593,7 +1669,7 @@ pub enum ExprKind {
     /// An assignment with an operator.
     ///
     /// E.g., `a += 1`.
-    AssignOp(BinOp, P<Expr>, P<Expr>),
+    AssignOp(AssignOp, P<Expr>, P<Expr>),
     /// Access of a named (e.g., `obj.foo`) or unnamed (e.g., `obj.0`) struct field.
     Field(P<Expr>, Ident),
     /// An indexing operation (e.g., `foo[2]`).
@@ -3857,7 +3933,7 @@ mod size_asserts {
     static_assert_size!(Item, 144);
     static_assert_size!(ItemKind, 80);
     static_assert_size!(LitKind, 24);
-    static_assert_size!(Local, 80);
+    static_assert_size!(Local, 96);
     static_assert_size!(MetaItemLit, 40);
     static_assert_size!(Param, 40);
     static_assert_size!(Pat, 72);

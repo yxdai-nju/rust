@@ -135,7 +135,10 @@ impl<'p, 'tcx: 'p> RustcPatCtxt<'p, 'tcx> {
     /// Returns the hidden type corresponding to this key if the body under analysis is allowed to
     /// know it.
     fn reveal_opaque_key(&self, key: OpaqueTypeKey<'tcx>) -> Option<Ty<'tcx>> {
-        self.typeck_results.concrete_opaque_types.get(&key).map(|x| x.ty)
+        self.typeck_results
+            .concrete_opaque_types
+            .get(&key.def_id)
+            .map(|x| ty::EarlyBinder::bind(x.ty).instantiate(self.tcx, key.args))
     }
     // This can take a non-revealed `Ty` because it reveals opaques itself.
     pub fn is_uninhabited(&self, ty: Ty<'tcx>) -> bool {
@@ -457,7 +460,7 @@ impl<'p, 'tcx: 'p> RustcPatCtxt<'p, 'tcx> {
             PatKind::AscribeUserType { subpattern, .. }
             | PatKind::ExpandedConstant { subpattern, .. } => return self.lower_pat(subpattern),
             PatKind::Binding { subpattern: Some(subpat), .. } => return self.lower_pat(subpat),
-            PatKind::Binding { subpattern: None, .. } | PatKind::Wild => {
+            PatKind::Missing | PatKind::Binding { subpattern: None, .. } | PatKind::Wild => {
                 ctor = Wildcard;
                 fields = vec![];
                 arity = 0;

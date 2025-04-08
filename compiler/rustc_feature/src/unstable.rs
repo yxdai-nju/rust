@@ -211,7 +211,7 @@ declare_features! (
     (internal, custom_mir, "1.65.0", None),
     /// Outputs useful `assert!` messages
     (unstable, generic_assert, "1.63.0", None),
-    /// Allows using the `rust-intrinsic`'s "ABI".
+    /// Allows using the #[rustc_intrinsic] attribute.
     (internal, intrinsics, "1.0.0", None),
     /// Allows using `#[lang = ".."]` attribute for linking items to special compiler logic.
     (internal, lang_items, "1.0.0", None),
@@ -324,6 +324,7 @@ declare_features! (
     (unstable, loongarch_target_feature, "1.73.0", Some(44839)),
     (unstable, m68k_target_feature, "1.85.0", Some(134328)),
     (unstable, mips_target_feature, "1.27.0", Some(44839)),
+    (unstable, movrs_target_feature, "CURRENT_RUSTC_VERSION", Some(137976)),
     (unstable, powerpc_target_feature, "1.27.0", Some(44839)),
     (unstable, prfchw_target_feature, "1.78.0", Some(44839)),
     (unstable, riscv_target_feature, "1.45.0", Some(44839)),
@@ -628,6 +629,8 @@ declare_features! (
     (unstable, strict_provenance_lints, "1.61.0", Some(130351)),
     /// Allows string patterns to dereference values to match them.
     (unstable, string_deref_patterns, "1.67.0", Some(87121)),
+    /// Allows `super let` statements.
+    (unstable, super_let, "CURRENT_RUSTC_VERSION", Some(139076)),
     /// Allows subtrait items to shadow supertrait items.
     (unstable, supertrait_item_shadowing, "1.86.0", Some(89151)),
     /// Allows using `#[thread_local]` on `static` items.

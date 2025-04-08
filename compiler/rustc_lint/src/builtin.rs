@@ -29,6 +29,7 @@ use rustc_hir::def_id::{CRATE_DEF_ID, DefId, LocalDefId};
 use rustc_hir::intravisit::FnKind as HirFnKind;
 use rustc_hir::{Body, FnDecl, GenericParamKind, PatKind, PredicateOrigin};
 use rustc_middle::bug;
+use rustc_middle::lint::LevelAndSource;
 use rustc_middle::ty::layout::LayoutOf;
 use rustc_middle::ty::print::with_no_trimmed_paths;
 use rustc_middle::ty::{self, Ty, TyCtxt, TypeVisitableExt, Upcast, VariantDef};
@@ -694,7 +695,8 @@ impl<'tcx> LateLintPass<'tcx> for MissingDebugImplementations {
         }
 
         // Avoid listing trait impls if the trait is allowed.
-        let (level, _) = cx.tcx.lint_level_at_node(MISSING_DEBUG_IMPLEMENTATIONS, item.hir_id());
+        let LevelAndSource { level, .. } =
+            cx.tcx.lint_level_at_node(MISSING_DEBUG_IMPLEMENTATIONS, item.hir_id());
         if level == Level::Allow {
             return;
         }
@@ -777,21 +779,19 @@ impl EarlyLintPass for AnonymousParameters {
         }
         if let ast::AssocItemKind::Fn(box Fn { ref sig, .. }) = it.kind {
             for arg in sig.decl.inputs.iter() {
-                if let ast::PatKind::Ident(_, ident, None) = arg.pat.kind {
-                    if ident.name == kw::Empty {
-                        let ty_snip = cx.sess().source_map().span_to_snippet(arg.ty.span);
+                if let ast::PatKind::Missing = arg.pat.kind {
+                    let ty_snip = cx.sess().source_map().span_to_snippet(arg.ty.span);
 
-                        let (ty_snip, appl) = if let Ok(ref snip) = ty_snip {
-                            (snip.as_str(), Applicability::MachineApplicable)
-                        } else {
-                            ("<type>", Applicability::HasPlaceholders)
-                        };
-                        cx.emit_span_lint(
-                            ANONYMOUS_PARAMETERS,
-                            arg.pat.span,
-                            BuiltinAnonymousParams { suggestion: (arg.pat.span, appl), ty_snip },
-                        );
-                    }
+                    let (ty_snip, appl) = if let Ok(ref snip) = ty_snip {
+                        (snip.as_str(), Applicability::MachineApplicable)
+                    } else {
+                        ("<type>", Applicability::HasPlaceholders)
+                    };
+                    cx.emit_span_lint(
+                        ANONYMOUS_PARAMETERS,
+                        arg.pat.span,
+                        BuiltinAnonymousParams { suggestion: (arg.pat.span, appl), ty_snip },
+                    );
                 }
             }
         }

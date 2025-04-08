@@ -11,7 +11,6 @@ use rustc_hir::def::{CtorKind, DefKind, Res};
 use rustc_hir::def_id::{CrateNum, DefId, LOCAL_CRATE, LocalDefId};
 use rustc_hir::lang_items::LangItem;
 use rustc_hir::{BodyId, Mutability};
-use rustc_hir_analysis::check::intrinsic::intrinsic_operation_unsafety;
 use rustc_index::IndexVec;
 use rustc_metadata::rendered_const;
 use rustc_middle::span_bug;
@@ -367,10 +366,7 @@ impl fmt::Debug for Item {
 pub(crate) fn rustc_span(def_id: DefId, tcx: TyCtxt<'_>) -> Span {
     Span::new(def_id.as_local().map_or_else(
         || tcx.def_span(def_id),
-        |local| {
-            let hir = tcx.hir();
-            hir.span_with_body(tcx.local_def_id_to_hir_id(local))
-        },
+        |local| tcx.hir_span_with_body(tcx.local_def_id_to_hir_id(local)),
     ))
 }
 
@@ -690,8 +686,6 @@ impl Item {
                 hir::FnHeader {
                     safety: if tcx.codegen_fn_attrs(def_id).safe_target_features {
                         hir::HeaderSafety::SafeTargetFeatures
-                    } else if abi == ExternAbi::RustIntrinsic {
-                        intrinsic_operation_unsafety(tcx, def_id.expect_local()).into()
                     } else {
                         safety.into()
                     },

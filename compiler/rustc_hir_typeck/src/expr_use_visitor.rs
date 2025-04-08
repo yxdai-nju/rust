@@ -611,6 +611,7 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
         for pat in pats {
             self.cat_pattern(discr_place.clone(), pat, &mut |place, pat| {
                 match &pat.kind {
+                    PatKind::Missing => unreachable!(),
                     PatKind::Binding(.., opt_sub_pat) => {
                         // If the opt_sub_pat is None, then the binding does not count as
                         // a wildcard for the purpose of borrowing discr.
@@ -1182,9 +1183,7 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
                 self.cx.error_reported_in_ty(ty)?;
                 if ty.is_ty_var() {
                     debug!("resolve_type_vars_or_bug: infer var from {:?}", ty);
-                    Err(self
-                        .cx
-                        .report_bug(self.cx.tcx().hir().span(id), "encountered type variable"))
+                    Err(self.cx.report_bug(self.cx.tcx().hir_span(id), "encountered type variable"))
                 } else {
                     Ok(ty)
                 }
@@ -1509,10 +1508,7 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
         if node_ty != place_ty
             && self
                 .cx
-                .try_structurally_resolve_type(
-                    self.cx.tcx().hir().span(base_place.hir_id),
-                    place_ty,
-                )
+                .try_structurally_resolve_type(self.cx.tcx().hir_span(base_place.hir_id), place_ty)
                 .is_impl_trait()
         {
             projections.push(Projection { kind: ProjectionKind::OpaqueCast, ty: node_ty });
@@ -1551,17 +1547,14 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
         let base_curr_ty = base_place.place.ty();
         let deref_ty = match self
             .cx
-            .try_structurally_resolve_type(
-                self.cx.tcx().hir().span(base_place.hir_id),
-                base_curr_ty,
-            )
+            .try_structurally_resolve_type(self.cx.tcx().hir_span(base_place.hir_id), base_curr_ty)
             .builtin_deref(true)
         {
             Some(ty) => ty,
             None => {
                 debug!("explicit deref of non-derefable type: {:?}", base_curr_ty);
                 return Err(self.cx.report_bug(
-                    self.cx.tcx().hir().span(node),
+                    self.cx.tcx().hir_span(node),
                     "explicit deref of non-derefable type",
                 ));
             }
@@ -1840,6 +1833,7 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
             | PatKind::Expr(..)
             | PatKind::Range(..)
             | PatKind::Never
+            | PatKind::Missing
             | PatKind::Wild
             | PatKind::Err(_) => {
                 // always ok

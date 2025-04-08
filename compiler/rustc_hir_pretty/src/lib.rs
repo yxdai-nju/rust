@@ -960,12 +960,16 @@ impl<'a> State<'a> {
 
     fn print_local(
         &mut self,
+        super_: bool,
         init: Option<&hir::Expr<'_>>,
         els: Option<&hir::Block<'_>>,
         decl: impl Fn(&mut Self),
     ) {
         self.space_if_not_bol();
         self.ibox(INDENT_UNIT);
+        if super_ {
+            self.word_nbsp("super");
+        }
         self.word_nbsp("let");
 
         self.ibox(INDENT_UNIT);
@@ -995,7 +999,9 @@ impl<'a> State<'a> {
         self.maybe_print_comment(st.span.lo());
         match st.kind {
             hir::StmtKind::Let(loc) => {
-                self.print_local(loc.init, loc.els, |this| this.print_local_decl(loc));
+                self.print_local(loc.super_.is_some(), loc.init, loc.els, |this| {
+                    this.print_local_decl(loc)
+                });
             }
             hir::StmtKind::Item(item) => self.ann.nested(self, Nested::Item(item)),
             hir::StmtKind::Expr(expr) => {
@@ -1271,18 +1277,18 @@ impl<'a> State<'a> {
         self.print_call_post(base_args)
     }
 
-    fn print_expr_binary(&mut self, op: hir::BinOp, lhs: &hir::Expr<'_>, rhs: &hir::Expr<'_>) {
-        let binop_prec = op.node.precedence();
+    fn print_expr_binary(&mut self, op: hir::BinOpKind, lhs: &hir::Expr<'_>, rhs: &hir::Expr<'_>) {
+        let binop_prec = op.precedence();
         let left_prec = lhs.precedence();
         let right_prec = rhs.precedence();
 
-        let (mut left_needs_paren, right_needs_paren) = match op.node.fixity() {
+        let (mut left_needs_paren, right_needs_paren) = match op.fixity() {
             Fixity::Left => (left_prec < binop_prec, right_prec <= binop_prec),
             Fixity::Right => (left_prec <= binop_prec, right_prec < binop_prec),
             Fixity::None => (left_prec <= binop_prec, right_prec <= binop_prec),
         };
 
-        match (&lhs.kind, op.node) {
+        match (&lhs.kind, op) {
             // These cases need parens: `x as i32 < y` has the parser thinking that `i32 < y` is
             // the beginning of a path type. It starts trying to parse `x as (i32 < y ...` instead
             // of `(x as i32) < ...`. We need to convince it _not_ to do that.
@@ -1297,7 +1303,7 @@ impl<'a> State<'a> {
 
         self.print_expr_cond_paren(lhs, left_needs_paren);
         self.space();
-        self.word_space(op.node.as_str());
+        self.word_space(op.as_str());
         self.print_expr_cond_paren(rhs, right_needs_paren);
     }
 
@@ -1451,7 +1457,7 @@ impl<'a> State<'a> {
                 self.word(".use");
             }
             hir::ExprKind::Binary(op, lhs, rhs) => {
-                self.print_expr_binary(op, lhs, rhs);
+                self.print_expr_binary(op.node, lhs, rhs);
             }
             hir::ExprKind::Unary(op, expr) => {
                 self.print_expr_unary(op, expr);
@@ -1488,7 +1494,7 @@ impl<'a> State<'a> {
 
                 // Print `let _t = $init;`:
                 let temp = Ident::from_str("_t");
-                self.print_local(Some(init), None, |this| this.print_ident(temp));
+                self.print_local(false, Some(init), None, |this| this.print_ident(temp));
                 self.word(";");
 
                 // Print `_t`:
@@ -1572,8 +1578,7 @@ impl<'a> State<'a> {
             hir::ExprKind::AssignOp(op, lhs, rhs) => {
                 self.print_expr_cond_paren(lhs, lhs.precedence() <= ExprPrecedence::Assign);
                 self.space();
-                self.word(op.node.as_str());
-                self.word_space("=");
+                self.word_space(op.node.as_str());
                 self.print_expr_cond_paren(rhs, rhs.precedence() < ExprPrecedence::Assign);
             }
             hir::ExprKind::Field(expr, ident) => {
@@ -1869,6 +1874,7 @@ impl<'a> State<'a> {
         // Pat isn't normalized, but the beauty of it
         // is that it doesn't matter
         match pat.kind {
+            PatKind::Missing => unreachable!(),
             PatKind::Wild => self.word("_"),
             PatKind::Never => self.word("!"),
             PatKind::Binding(BindingMode(by_ref, mutbl), _, ident, sub) => {
