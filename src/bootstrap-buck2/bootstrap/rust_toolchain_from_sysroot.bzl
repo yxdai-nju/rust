@@ -1,28 +1,30 @@
 load("@prelude//rust:rust_toolchain.bzl", "PanicRuntime", "RustToolchainInfo")
+load("@bootstrap//:sysroot_types.bzl", "SysrootInfo")
 
 def rust_toolchain_from_sysroot_impl(ctx):
-    sysroot_path = ctx.attrs.sysroot_path
-    
+    sysroot = ctx.attrs.sysroot[SysrootInfo]
+
     return [
         DefaultInfo(),
         RustToolchainInfo(
-            clippy_driver = RunInfo(args = [sysroot_path + "/bin/clippy-driver"]),
-            compiler = RunInfo(args = [sysroot_path + "/bin/rustc"]),
+            clippy_driver = sysroot.clippy_driver_bin,
+            compiler = sysroot.rustc_bin,
             default_edition = ctx.attrs.default_edition,
             panic_runtime = PanicRuntime("unwind"),
             rustc_binary_flags = ctx.attrs.rustc_binary_flags,
-            rustc_flags = ctx.attrs.rustc_flags + ["--sysroot", sysroot_path],
+            rustc_flags = ctx.attrs.rustc_flags,
             rustc_target_triple = ctx.attrs.rustc_target_triple,
             rustc_test_flags = ctx.attrs.rustc_test_flags,
-            rustdoc = RunInfo(args = [sysroot_path + "/bin/rustdoc"]),
+            rustdoc = sysroot.rustdoc_bin,
             rustdoc_flags = ctx.attrs.rustdoc_flags,
+            sysroot_path = sysroot.directory.default_outputs[0],
         ),
     ]
 
 rust_toolchain_from_sysroot = rule(
     impl = rust_toolchain_from_sysroot_impl,
     attrs = {
-        "sysroot_path": attrs.string(),
+        "sysroot": attrs.dep(providers = [SysrootInfo]),
         "default_edition": attrs.option(attrs.string(), default = None),
         "rustc_binary_flags": attrs.list(attrs.string(), default = []),
         "rustc_flags": attrs.list(attrs.string(), default = []),

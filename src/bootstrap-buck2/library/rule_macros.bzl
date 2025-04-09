@@ -1,6 +1,6 @@
 load("@prelude//rust:cargo_package.bzl", "cargo")
 
-_STAGE0_RUSTC_FLAGS = [
+_BETA_TO_STAGE0_RUSTC_FLAGS = [
     "--cfg=bootstrap",
     "--check-cfg=cfg(bootstrap)",
 ]
@@ -10,8 +10,8 @@ _EXTRA_RUSTC_FLAGS = [
 ]
 
 _RUSTC_FLAGS = select({
-    "bootstrap//constraints:use_beta": _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:use_stage0": _STAGE0_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:use_beta": _BETA_TO_STAGE0_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:use_stage0": _EXTRA_RUSTC_FLAGS,
     "bootstrap//constraints:use_stage1": _EXTRA_RUSTC_FLAGS,
     "bootstrap//constraints:use_stage1p": _EXTRA_RUSTC_FLAGS,
     "bootstrap//constraints:use_stage2": _EXTRA_RUSTC_FLAGS,

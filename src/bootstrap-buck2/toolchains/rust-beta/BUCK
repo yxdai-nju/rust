@@ -38,7 +38,7 @@ sysroot_from_http_archive(
 
 rust_toolchain_from_sysroot(
     name = "rust",
-    sysroot_path = ":sysroot",
+    sysroot = ":sysroot",
     default_edition = "2024",
     visibility = ["PUBLIC"],
 )
