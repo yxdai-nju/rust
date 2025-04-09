@@ -2,6 +2,7 @@ load("@bootstrap//:sysroot.bzl", "sysroot_from_http_archive")
 load("@bootstrap//:rust_toolchain_from_sysroot.bzl", "rust_toolchain_from_sysroot")
 
 # TODO(yxdai-nju): allow customizing target triple
+# TODO(yxdai-nju): support parsing '[rust]/src/stage0' for URLs and sha256 digests
 
 http_archive(
     name = "rust-std-beta",
