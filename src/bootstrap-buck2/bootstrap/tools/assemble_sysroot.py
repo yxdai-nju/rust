@@ -14,8 +14,8 @@ Arguments:
     --dest SYSROOT_PATH     Path to the sysroot directory to create (required)
 
 Example:
-    assemble_sysroot.py --rust-std ./rust-std-1.85.0 --rustc ./rustc-1.85.0 \
-                        --cargo ./cargo-1.85.0 --dest ./my-sysroot
+    assemble_sysroot.py --rust-std ./rust-std-beta --rustc ./rustc-beta \
+                        --cargo ./cargo-beta --dest ./sysroot-for-beta
 """
 
 import argparse

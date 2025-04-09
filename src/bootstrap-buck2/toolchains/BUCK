@@ -30,7 +30,7 @@ toolchain_alias(
     visibility = ["PUBLIC"],
 )
 
-alias(
+toolchain_alias(
     name = "rust_beta",
     actual = "toolchains//rust-beta:rust",
 )
