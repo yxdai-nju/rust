@@ -1,0 +1,34 @@
+constraint_setting(
+    name = "rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "use_beta",
+    constraint_setting = ":rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "use_stage0",
+    constraint_setting = ":rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "use_stage1",
+    constraint_setting = ":rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "use_stage1p",
+    constraint_setting = ":rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "use_stage2",
+    constraint_setting = ":rust_bootstrap",
+    visibility = ["PUBLIC"],
+)

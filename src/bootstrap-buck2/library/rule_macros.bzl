@@ -2,17 +2,19 @@ load("@prelude//rust:cargo_package.bzl", "cargo")
 
 _STAGE0_RUSTC_FLAGS = [
     "--cfg=bootstrap",
-    "--check-cfg=values(bootstrap)",
+    "--check-cfg=cfg(bootstrap)",
 ]
 
-_ADDITIONAL_RUSTC_FLAGS = [
-    "opt-level=3",
+_EXTRA_RUSTC_FLAGS = [
+    "-Copt-level=3",
 ]
 
 _RUSTC_FLAGS = select({
-    "bootstrap//:stage0": _STAGE0_RUSTC_FLAGS + _ADDITIONAL_RUSTC_FLAGS,
-    "bootstrap//:stage1": _ADDITIONAL_RUSTC_FLAGS,
-    "bootstrap//:stage2": _ADDITIONAL_RUSTC_FLAGS,
+    "bootstrap//constraints:use_beta": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:use_stage0": _STAGE0_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:use_stage1": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:use_stage1p": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:use_stage2": _EXTRA_RUSTC_FLAGS,
 })
 
 def stdlib_rust_library(name, **kwargs):

@@ -1,6 +1,6 @@
 load("@prelude//rust:rust_toolchain.bzl", "PanicRuntime", "RustToolchainInfo")
 
-def custom_rust_toolchain_impl(ctx):
+def rust_toolchain_from_sysroot_impl(ctx):
     sysroot_path = ctx.attrs.sysroot_path
     
     return [
@@ -19,8 +19,8 @@ def custom_rust_toolchain_impl(ctx):
         ),
     ]
 
-custom_rust_toolchain = rule(
-    impl = custom_rust_toolchain_impl,
+rust_toolchain_from_sysroot = rule(
+    impl = rust_toolchain_from_sysroot_impl,
     attrs = {
         "sysroot_path": attrs.string(),
         "default_edition": attrs.option(attrs.string(), default = None),
