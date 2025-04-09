@@ -1,6 +1,6 @@
 load("@prelude//toolchains:cxx.bzl", "system_cxx_toolchain")
 load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain")
-load(":custom_rust_toolchain.bzl", "custom_rust_toolchain")
+load("@bootstrap//:toolchain.bzl", "rust_bootstrap_toolchain")
 
 system_cxx_toolchain(
     name = "cxx",
@@ -12,34 +12,25 @@ system_python_bootstrap_toolchain(
     visibility = ["PUBLIC"],
 )
 
+rust_bootstrap_toolchain(
+    name = "rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
 toolchain_alias(
     name = "rust",
     actual = select({
-        "DEFAULT": ":stage2_rust_toolchain",
-        "bootstrap//:stage0": ":stage0_rust_toolchain",
-        "bootstrap//:stage1": ":stage1_rust_toolchain",
-        "bootstrap//:stage2": ":stage2_rust_toolchain",
+        "DEFAULT": ":rust_beta",
+        "bootstrap//constraints:use_beta": ":rust_beta",
+        # "bootstrap//constraints:use_stage0": ":rust_stage0",
+        # "bootstrap//constraints:use_stage1": ":rust_stage1",
+        # "bootstrap//constraints:use_stage1p": ":rust_stage1p",
+        # "bootstrap//constraints:use_stage2": ":rust_stage2",
     }),
     visibility = ["PUBLIC"],
 )
 
-custom_rust_toolchain(
-    name = "stage0_rust_toolchain",
-    # TODO(yxdai-nju): avoid hard-coding devcontainer paths
-    sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage0",
-    default_edition = "2024",
-)
-
-custom_rust_toolchain(
-    name = "stage1_rust_toolchain",
-    # TODO(yxdai-nju): avoid hard-coding devcontainer paths
-    sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage1",
-    default_edition = "2024",
-)
-
-custom_rust_toolchain(
-    name = "stage2_rust_toolchain",
-    # TODO(yxdai-nju): avoid hard-coding devcontainer paths
-    sysroot_path = "/workdir/build/x86_64-unknown-linux-gnu/stage2",
-    default_edition = "2024",
+alias(
+    name = "rust_beta",
+    actual = "toolchains//rust-beta:rust",
 )
