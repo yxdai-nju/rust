@@ -8,22 +8,36 @@ execution_platform(
 )
 
 platform(
-    name = "stage0",
-    constraint_values = ["bootstrap//:stage0"],
+    name = "rust_beta",
+    constraint_values = ["bootstrap//constraints:use_beta"],
     deps = [":default"],
     visibility = ["PUBLIC"],
 )
 
 platform(
-    name = "stage1",
-    constraint_values = ["bootstrap//:stage1"],
+    name = "rust_stage0",
+    constraint_values = ["bootstrap//constraints:use_stage0"],
     deps = [":default"],
     visibility = ["PUBLIC"],
 )
 
 platform(
-    name = "stage2",
-    constraint_values = ["bootstrap//:stage2"],
+    name = "rust_stage1",
+    constraint_values = ["bootstrap//constraints:use_stage1"],
+    deps = [":default"],
+    visibility = ["PUBLIC"],
+)
+
+platform(
+    name = "rust_stage1p",
+    constraint_values = ["bootstrap//constraints:use_stage1p"],
+    deps = [":default"],
+    visibility = ["PUBLIC"],
+)
+
+platform(
+    name = "rust_stage2",
+    constraint_values = ["bootstrap//constraints:use_stage2"],
     deps = [":default"],
     visibility = ["PUBLIC"],
 )
