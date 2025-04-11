@@ -10,20 +10,21 @@ _EXTRA_RUSTC_FLAGS = [
 ]
 
 _RUSTC_FLAGS = select({
-    "bootstrap//constraints:use_beta": _BETA_TO_STAGE0_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:use_stage0": _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:use_stage1": _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:use_stage1p": _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:use_stage2": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:beta": _BETA_TO_STAGE0_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:stage0": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:stage1": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:stage1p": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:stage2": _EXTRA_RUSTC_FLAGS,
 })
 
 def stdlib_rust_library(name, **kwargs):
-    env = kwargs.get("env", {})
-    rustc_flags = kwargs.get("rustc_flags", [])
+    rustc_flags = kwargs.pop("rustc_flags", [])
+    env = kwargs.pop("env", {})
 
     rustc_flags = rustc_flags + _RUSTC_FLAGS
     env["RUSTC_BOOTSTRAP"] = "1"
 
     kwargs["rustc_flags"] = rustc_flags
+    kwargs["env"] = env
 
-    cargo.rust_library(name, env = env, **kwargs)
+    cargo.rust_library(name, **kwargs)

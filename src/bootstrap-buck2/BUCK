@@ -1,0 +1,5 @@
+configured_alias(
+    name = "core",
+    actual = "//library:core",
+    platform = "bootstrap//platforms:rust_beta",
+)

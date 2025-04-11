@@ -1,12 +1,39 @@
-load("@bootstrap//tools:defs.bzl", "bootstrap_internal_tools")
+load("@prelude//rust:cargo_package.bzl", "cargo")
+load("@bootstrap//tools:defs.bzl", "bootstrap_internal_tools", "rust_bootstrap_binary")
 
 bootstrap_internal_tools(
     name = "internal_tools",
     visibility = ["PUBLIC"],
 )
 
+# Rust bootstrap internal tools to be built with system Python
+# toolchain (toolchains//:buck2_bootstrap_system_python_toolchain)
 python_bootstrap_binary(
     name = "assemble_sysroot",
-    main = "assemble_sysroot.py",
+    main = "src/bin/assemble_sysroot.py",
+    visibility = ["PUBLIC"],
+)
+
+# Rust bootstrap internal tools to be built with beta Rust
+# toolchain (toolchains//:buck2_bootstrap_beta_rust_toolchain)
+filegroup(
+    name = "rust-bootstrap-internal-tools.crate",
+    srcs = [
+        "src/bin/example_tool.rs",
+    ],
+)
+
+crate_deps = [
+    "bootstrap//tools/third-party:clap",
+    "bootstrap//tools/third-party:thiserror",
+    "bootstrap//tools/third-party:walkdir",
+]
+
+rust_bootstrap_binary(
+    name = "example_tool",
+    srcs = [":rust-bootstrap-internal-tools.crate"],
+    crate_root = "rust-bootstrap-internal-tools.crate/src/bin/example_tool.rs",
+    deps = crate_deps,
+    edition = "2024",
     visibility = ["PUBLIC"],
 )

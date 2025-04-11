@@ -1,5 +1,6 @@
 RustBootstrapInternalToolsInfo = provider(fields = {
     "assemble_sysroot": provider_field(RunInfo),
+    "example_tool": provider_field(RunInfo),
 })
 
 RustBootstrapToolchainInfo = provider(fields = {

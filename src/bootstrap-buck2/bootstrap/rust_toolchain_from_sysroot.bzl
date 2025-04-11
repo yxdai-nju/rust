@@ -1,7 +1,7 @@
 load("@prelude//rust:rust_toolchain.bzl", "PanicRuntime", "RustToolchainInfo")
 load("@bootstrap//:sysroot_types.bzl", "SysrootInfo")
 
-def rust_toolchain_from_sysroot_impl(ctx):
+def _rust_toolchain_from_sysroot_impl(ctx):
     sysroot = ctx.attrs.sysroot[SysrootInfo]
 
     return [
@@ -21,8 +21,8 @@ def rust_toolchain_from_sysroot_impl(ctx):
         ),
     ]
 
-rust_toolchain_from_sysroot = rule(
-    impl = rust_toolchain_from_sysroot_impl,
+_rust_toolchain_from_sysroot = rule(
+    impl = _rust_toolchain_from_sysroot_impl,
     attrs = {
         "sysroot": attrs.dep(providers = [SysrootInfo]),
         "default_edition": attrs.option(attrs.string(), default = None),
@@ -35,3 +35,13 @@ rust_toolchain_from_sysroot = rule(
     },
     is_toolchain_rule = True,
 )
+
+def rust_toolchain_from_sysroot(**kwargs):
+    kwargs["exec_compatible_with"] = select({
+        "bootstrap//constraints:beta": ["bootstrap//constraints:beta"],
+        "bootstrap//constraints:stage0": ["bootstrap//constraints:stage0"],
+        "bootstrap//constraints:stage1": ["bootstrap//constraints:stage1"],
+        "bootstrap//constraints:stage1p": ["bootstrap//constraints:stage1p"],
+        "bootstrap//constraints:stage2": ["bootstrap//constraints:stage2"],
+    })
+    _rust_toolchain_from_sysroot(**kwargs)

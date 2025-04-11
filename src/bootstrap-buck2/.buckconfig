@@ -17,10 +17,10 @@ buck = none
 prelude = bundled
 
 [parser]
-target_platform_detector_spec = target:root//...->prelude//platforms:default
+target_platform_detector_spec = target:root//...->bootstrap//platforms:default
 
 [build]
-execution_platforms = prelude//platforms:default
+execution_platforms = bootstrap//platforms:platforms
 
 [project]
-ignore = .git, build, target
+ignore = .git, target
