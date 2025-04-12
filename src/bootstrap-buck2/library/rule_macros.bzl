@@ -27,4 +27,4 @@ def stdlib_rust_library(name, **kwargs):
     kwargs["rustc_flags"] = rustc_flags
     kwargs["env"] = env
 
-    cargo.rust_library(name, **kwargs)
+    cargo.rust_library(name = name, **kwargs)

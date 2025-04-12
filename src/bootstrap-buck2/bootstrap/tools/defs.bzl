@@ -19,13 +19,12 @@ bootstrap_internal_tools = rule(
     },
 )
 
-def rust_bootstrap_binary(**kwargs):
-    name = kwargs.pop("name", "")
-
+def rust_bootstrap_binary(name, **kwargs):
     native.configured_alias(
         name = name,
         actual = ":_" + name,
         platform = "bootstrap//platforms:rust_beta",
+        visibility = kwargs.pop("visibility", []),
     )
     cargo.rust_binary(
         name = "_" + name,

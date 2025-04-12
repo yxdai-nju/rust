@@ -10,17 +10,17 @@ _RUSTC_FLAGS = select({
 })
 
 def rbi_rust_binary(name, **kwargs):
-    rustc_flags = kwargs.get("rustc_flags", [])
+    rustc_flags = kwargs.pop("rustc_flags", [])
 
     rustc_flags = rustc_flags + _RUSTC_FLAGS
     kwargs["rustc_flags"] = rustc_flags
 
-    cargo.rust_binary(name, **kwargs)
+    cargo.rust_binary(name = name, **kwargs)
 
 def rbi_rust_library(name, **kwargs):
-    rustc_flags = kwargs.get("rustc_flags", [])
+    rustc_flags = kwargs.pop("rustc_flags", [])
 
     rustc_flags = rustc_flags + _RUSTC_FLAGS
     kwargs["rustc_flags"] = rustc_flags
 
-    cargo.rust_library(name, **kwargs)
+    cargo.rust_library(name = name, **kwargs)

@@ -21,7 +21,7 @@ def _rust_toolchain_from_sysroot_impl(ctx):
         ),
     ]
 
-_rust_toolchain_from_sysroot = rule(
+_rust_toolchain_from_sysroot_rule = rule(
     impl = _rust_toolchain_from_sysroot_impl,
     attrs = {
         "sysroot": attrs.dep(providers = [SysrootInfo]),
@@ -36,12 +36,16 @@ _rust_toolchain_from_sysroot = rule(
     is_toolchain_rule = True,
 )
 
-def rust_toolchain_from_sysroot(**kwargs):
-    kwargs["exec_compatible_with"] = select({
+def rust_toolchain_from_sysroot(name, **kwargs):
+    exec_compatible_with = select({
         "bootstrap//constraints:beta": ["bootstrap//constraints:beta"],
         "bootstrap//constraints:stage0": ["bootstrap//constraints:stage0"],
         "bootstrap//constraints:stage1": ["bootstrap//constraints:stage1"],
         "bootstrap//constraints:stage1p": ["bootstrap//constraints:stage1p"],
         "bootstrap//constraints:stage2": ["bootstrap//constraints:stage2"],
     })
-    _rust_toolchain_from_sysroot(**kwargs)
+    _rust_toolchain_from_sysroot_rule(
+        name = name,
+        exec_compatible_with = exec_compatible_with,
+        **kwargs,
+    )

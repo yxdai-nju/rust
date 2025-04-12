@@ -23,13 +23,13 @@ RUN useradd -m -s /bin/bash -u $USER_UID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 USER $USERNAME
 
-# Install Rust with nightly-2025-01-03 toolchain (required by Buck2)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly-2025-01-03 -y
+# Install Rust with nightly-2025-02-16 toolchain (required by Buck2)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly-2025-02-16 -y
 ENV PATH="/home/$USERNAME/.cargo/bin:$PATH"
 
 # Install Buck2 and Reindeer
-RUN cargo install --git https://github.com/facebook/buck2.git --rev 8c3ed01 buck2
-RUN cargo install --git https://github.com/facebookincubator/reindeer.git --rev 2a8cc41 reindeer
+RUN cargo install --git https://github.com/facebook/buck2.git --rev 6fe1de0 buck2
+RUN cargo install --git https://github.com/facebookincubator/reindeer.git --rev c3d939b reindeer
 
 # Create and set permissions for workdir directory and other directories
 USER root
