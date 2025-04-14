@@ -38,10 +38,8 @@ _rust_toolchain_from_sysroot_rule = rule(
 
 def rust_toolchain_from_sysroot(name, **kwargs):
     exec_compatible_with = select({
-        "bootstrap//constraints:beta": ["bootstrap//constraints:beta"],
         "bootstrap//constraints:stage0": ["bootstrap//constraints:stage0"],
         "bootstrap//constraints:stage1": ["bootstrap//constraints:stage1"],
-        "bootstrap//constraints:stage1p": ["bootstrap//constraints:stage1p"],
         "bootstrap//constraints:stage2": ["bootstrap//constraints:stage2"],
     })
     _rust_toolchain_from_sysroot_rule(

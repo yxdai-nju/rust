@@ -28,7 +28,7 @@ def _extended_execution_platform_impl(ctx: AnalysisContext) -> list[Provider]:
         DefaultInfo(),
         platform_info,
         execution_platform_info,
-        ExecutionPlatformRegistrationInfo(platforms = [execution_platform_info])
+        ExecutionPlatformRegistrationInfo(platforms = [execution_platform_info]),
     ]
 
 extended_execution_platform = rule(
@@ -46,7 +46,7 @@ def _execution_platforms_impl(ctx: AnalysisContext) -> list[Provider]:
 
     return [
         DefaultInfo(),
-        ExecutionPlatformRegistrationInfo(platforms = exec_platforms)
+        ExecutionPlatformRegistrationInfo(platforms = exec_platforms),
     ]
 
 execution_platforms = rule(

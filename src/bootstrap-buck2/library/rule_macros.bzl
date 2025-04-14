@@ -1,6 +1,6 @@
 load("@prelude//rust:cargo_package.bzl", "cargo")
 
-_BETA_TO_STAGE0_RUSTC_FLAGS = [
+_STAGE0_TO_STAGE1_RUSTC_FLAGS = [
     "--cfg=bootstrap",
     "--check-cfg=cfg(bootstrap)",
 ]
@@ -10,10 +10,8 @@ _EXTRA_RUSTC_FLAGS = [
 ]
 
 _RUSTC_FLAGS = select({
-    "bootstrap//constraints:beta": _BETA_TO_STAGE0_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:stage0": _EXTRA_RUSTC_FLAGS,
+    "bootstrap//constraints:stage0": _STAGE0_TO_STAGE1_RUSTC_FLAGS + _EXTRA_RUSTC_FLAGS,
     "bootstrap//constraints:stage1": _EXTRA_RUSTC_FLAGS,
-    "bootstrap//constraints:stage1p": _EXTRA_RUSTC_FLAGS,
     "bootstrap//constraints:stage2": _EXTRA_RUSTC_FLAGS,
 })
 
@@ -28,3 +26,23 @@ def stdlib_rust_library(name, **kwargs):
     kwargs["env"] = env
 
     cargo.rust_library(name = name, **kwargs)
+
+def add_configured_aliases(platform):
+    targets = [
+        "//library:core",
+    ]
+
+    def _target_name_with_stage(target, platform):
+        name = target.split(":")[-1]
+        stage = platform.split("_")[-1]
+        return name + "-" + stage
+
+    [
+        native.configured_alias(
+            name = _target_name_with_stage(target, platform),
+            actual = target,
+            platform = platform,
+            visibility = ["PUBLIC"],
+        )
+        for target in targets
+    ]

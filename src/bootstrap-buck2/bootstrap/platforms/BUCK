@@ -12,18 +12,9 @@ execution_platforms(
     name = "platforms",
     platforms = [
         ":rust_bootstrap_stage2",
-        ":rust_bootstrap_stage1p",
         ":rust_bootstrap_stage1",
         ":rust_bootstrap_stage0",
-        ":rust_beta",
     ],
-    visibility = ["PUBLIC"],
-)
-
-extended_execution_platform(
-    name = "rust_beta",
-    base_platform = ":default",
-    constraint_values = ["bootstrap//constraints:beta"],
     visibility = ["PUBLIC"],
 )
 
@@ -38,13 +29,6 @@ extended_execution_platform(
     name = "rust_bootstrap_stage1",
     base_platform = ":default",
     constraint_values = ["bootstrap//constraints:stage1"],
-    visibility = ["PUBLIC"],
-)
-
-extended_execution_platform(
-    name = "rust_bootstrap_stage1p",
-    base_platform = ":default",
-    constraint_values = ["bootstrap//constraints:stage1p"],
     visibility = ["PUBLIC"],
 )
 

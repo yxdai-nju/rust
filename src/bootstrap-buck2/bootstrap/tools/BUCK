@@ -17,7 +17,7 @@ python_bootstrap_binary(
 # Rust bootstrap internal tools to be built with beta Rust
 # toolchain (toolchains//:buck2_bootstrap_beta_rust_toolchain)
 filegroup(
-    name = "rust-bootstrap-internal-tools.crate",
+    name = "rust-bootstrap-internal-tools-0.0.0.crate",
     srcs = [
         "src/bin/example_tool.rs",
     ],
@@ -31,8 +31,8 @@ crate_deps = [
 
 rust_bootstrap_binary(
     name = "example_tool",
-    srcs = [":rust-bootstrap-internal-tools.crate"],
-    crate_root = "rust-bootstrap-internal-tools.crate/src/bin/example_tool.rs",
+    srcs = [":rust-bootstrap-internal-tools-0.0.0.crate"],
+    crate_root = "rust-bootstrap-internal-tools-0.0.0.crate/src/bin/example_tool.rs",
     deps = crate_deps,
     edition = "2024",
     visibility = ["PUBLIC"],

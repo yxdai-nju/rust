@@ -14,7 +14,9 @@ buckfile_imports = """
 load(
     ":rule_macros.bzl",
     "stdlib_rust_library",
+    "add_configured_aliases",
 )
+add_configured_aliases(platform = "bootstrap//platforms:rust_bootstrap_stage0")
 """
 
 rust_library = "stdlib_rust_library"

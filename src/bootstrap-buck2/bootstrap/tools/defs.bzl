@@ -23,7 +23,7 @@ def rust_bootstrap_binary(name, **kwargs):
     native.configured_alias(
         name = name,
         actual = ":_" + name,
-        platform = "bootstrap//platforms:rust_beta",
+        platform = "bootstrap//platforms:rust_bootstrap_stage0",
         visibility = kwargs.pop("visibility", []),
     )
     cargo.rust_binary(

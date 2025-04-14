@@ -4,12 +4,6 @@ constraint_setting(
 )
 
 constraint_value(
-    name = "beta",
-    constraint_setting = ":rust_bootstrap_stage",
-    visibility = ["PUBLIC"],
-)
-
-constraint_value(
     name = "stage0",
     constraint_setting = ":rust_bootstrap_stage",
     visibility = ["PUBLIC"],
@@ -17,12 +11,6 @@ constraint_value(
 
 constraint_value(
     name = "stage1",
-    constraint_setting = ":rust_bootstrap_stage",
-    visibility = ["PUBLIC"],
-)
-
-constraint_value(
-    name = "stage1p",
     constraint_setting = ":rust_bootstrap_stage",
     visibility = ["PUBLIC"],
 )
