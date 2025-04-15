@@ -17,7 +17,8 @@ def _rust_toolchain_from_sysroot_impl(ctx):
             rustc_test_flags = ctx.attrs.rustc_test_flags,
             rustdoc = sysroot.rustdoc_bin,
             rustdoc_flags = ctx.attrs.rustdoc_flags,
-            sysroot_path = sysroot.directory.default_outputs[0],
+            # TODO(yxdai-nju): create two rules, one with sysroot, one without
+            # sysroot_path = sysroot.directory.default_outputs[0],
         ),
     ]
 

@@ -35,3 +35,22 @@ sysroot_from_http_archive = rule(
         "_assemble_sysroot": attrs.default_only(attrs.exec_dep(providers = [RunInfo], default = "bootstrap//tools:assemble_sysroot")),
     },
 )
+
+def _empty_sysroot_impl(ctx: AnalysisContext) -> list[Provider]:
+    rbi_assemble_sysroot = ctx.attrs._assemble_sysroot[RunInfo]
+
+    outdir = ctx.actions.declare_output(ctx.attrs.name, dir = True)
+    cmd = cmd_args([rbi_assemble_sysroot])
+    cmd.add("--dest", outdir.as_output())
+    ctx.actions.run(cmd, category = "rbi_assemble_sysroot")
+
+    return [
+        DefaultInfo(default_output = outdir),
+    ]
+
+empty_sysroot = rule(
+    impl =_empty_sysroot_impl,
+    attrs = {
+        "_assemble_sysroot": attrs.default_only(attrs.exec_dep(providers = [RunInfo], default = "bootstrap//tools:assemble_sysroot")),
+    },
+)

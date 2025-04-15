@@ -1,3 +1,4 @@
+load("@prelude//utils:lazy.bzl", "lazy")
 load("@prelude//rust:cargo_package.bzl", "cargo")
 
 _STAGE0_TO_STAGE1_RUSTC_FLAGS = [
@@ -6,7 +7,9 @@ _STAGE0_TO_STAGE1_RUSTC_FLAGS = [
 ]
 
 _EXTRA_RUSTC_FLAGS = [
+    "--sysroot=$(location toolchains//utils:empty_sysroot)",
     "-Copt-level=3",
+    "-Zforce-unstable-if-unmarked",
 ]
 
 _RUSTC_FLAGS = select({
@@ -14,6 +17,9 @@ _RUSTC_FLAGS = select({
     "bootstrap//constraints:stage1": _EXTRA_RUSTC_FLAGS,
     "bootstrap//constraints:stage2": _EXTRA_RUSTC_FLAGS,
 })
+
+def stdlib_rust_binary(name, **kwargs):
+    cargo.rust_binary(name = name, **kwargs)
 
 def stdlib_rust_library(name, **kwargs):
     rustc_flags = kwargs.pop("rustc_flags", [])
@@ -30,6 +36,11 @@ def stdlib_rust_library(name, **kwargs):
 def add_configured_aliases(platform):
     targets = [
         "//library:core",
+        "//library:std",
+        # "//library:compiler_builtins",
+        # "//library:alloc",
+        # "//library:panic_unwind",
+        # "//library:proc_macro",
     ]
 
     def _target_name_with_stage(target, platform):

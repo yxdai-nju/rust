@@ -1,0 +1,6 @@
+load("@bootstrap//:sysroot.bzl", "empty_sysroot")
+
+empty_sysroot(
+    name = "empty_sysroot",
+    visibility = ["PUBLIC"],
+)

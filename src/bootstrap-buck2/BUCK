@@ -1,0 +1,9 @@
+alias(
+    name = "core-stage0",
+    actual = "//library:core-stage0",
+)
+
+alias(
+    name = "std-stage0",
+    actual = "//library:std-stage0",
+)

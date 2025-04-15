@@ -16,6 +16,30 @@ path = "top/empty.rs"
 # and all options Cargo supports.
 [dependencies]
 core = { path = "src/core" }
+std = { path = "src/std" }
 
-# Local patches - typically git references
+panic_abort = { path = "src/panic_abort" }
+panic_unwind = { path = "src/panic_unwind", optional = false }
+
+addr2line = { version = "0.24.0", optional = false, default-features = false, features = ['rustc-dep-of-std'] }
+cfg-if = { version = "1.0", features = ['rustc-dep-of-std'] }
+compiler_builtins = { version = "=0.1.152", features = ['rustc-dep-of-std'] }
+hashbrown = { version = "0.15", default-features = false, features = ['rustc-dep-of-std'] }
+libc = { version = "0.2.171", default-features = false, features = ['rustc-dep-of-std'] }
+miniz_oxide = { version = "0.8.0", optional = false, default-features = false, features = ['rustc-dep-of-std'] }
+object = { version = "0.36.0", default-features = false, features = ['read_core', 'elf', 'macho', 'pe', 'unaligned', 'archive', 'rustc-dep-of-std'] }
+rustc-demangle = { version = "0.1.24", features = ['rustc-dep-of-std'] }
+std_detect = { path = "src/stdarch/crates/std_detect", default-features = false, features = ['rustc-dep-of-std'] }
+
+# Pseudo-dependencies that Rust uses to be able to depend on third-party crates
+# Need to be included as explicit deps here for Reindeer to recognize the patch
+# directive below.
+rustc-std-workspace-alloc = "1.0.0"
+rustc-std-workspace-core = "1.0.0"
+rustc-std-workspace-std = "1.0.0"
+
 [patch.crates-io]
+# Reason documented in https://github.com/rust-lang/rust/blob/master/library/rustc-std-workspace-core/README.md
+rustc-std-workspace-alloc = { path = "src/rustc-std-workspace-alloc" }
+rustc-std-workspace-core = { path = "src/rustc-std-workspace-core" }
+rustc-std-workspace-std = { path = "src/rustc-std-workspace-std" }
