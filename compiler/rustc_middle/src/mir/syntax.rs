@@ -652,6 +652,8 @@ pub enum CallSource {
     /// Other types of desugaring that did not come from the HIR, but we don't care about
     /// for diagnostics (yet).
     Misc,
+    /// Use of value, generating a clone function call
+    Use,
     /// Normal function call, no special source
     Normal,
 }
@@ -929,6 +931,8 @@ pub enum TerminatorKind<'tcx> {
         asm_macro: InlineAsmMacro,
 
         /// The template for the inline assembly, with placeholders.
+        #[type_foldable(identity)]
+        #[type_visitable(ignore)]
         template: &'tcx [InlineAsmTemplatePiece],
 
         /// The operands for the inline assembly, as `Operand`s or `Place`s.
@@ -939,6 +943,8 @@ pub enum TerminatorKind<'tcx> {
 
         /// Source spans for each line of the inline assembly code. These are
         /// used to map assembler errors back to the line in the source code.
+        #[type_foldable(identity)]
+        #[type_visitable(ignore)]
         line_spans: &'tcx [Span],
 
         /// Valid targets for the inline assembly.
