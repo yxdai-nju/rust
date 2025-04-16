@@ -1,10 +1,6 @@
-load(
-    "@bootstrap//:toolchain_types.bzl",
-    "RustBootstrapToolchainInfo",
-    "RustBootstrapInternalToolsInfo",
-)
+load("@bootstrap//:toolchain_types.bzl", "RustBootstrapToolchainInfo", "RustBootstrapInternalToolsInfo")
 
-def _rust_bootstrap_toolchain_impl(ctx: AnalysisContext) -> list[Provider]:
+def _buck2_bootstrap_stage0_rust_toolchain_impl(ctx: AnalysisContext) -> list[Provider]:
     return [
         DefaultInfo(),
         RustBootstrapToolchainInfo(
@@ -12,8 +8,8 @@ def _rust_bootstrap_toolchain_impl(ctx: AnalysisContext) -> list[Provider]:
         ),
     ]
 
-rust_bootstrap_toolchain = rule(
-    impl = _rust_bootstrap_toolchain_impl,
+buck2_bootstrap_stage0_rust_toolchain = rule(
+    impl = _buck2_bootstrap_stage0_rust_toolchain_impl,
     attrs = {
         "_internal_tools": attrs.default_only(attrs.exec_dep(providers = [RustBootstrapInternalToolsInfo], default = "bootstrap//tools:internal_tools")),
     },

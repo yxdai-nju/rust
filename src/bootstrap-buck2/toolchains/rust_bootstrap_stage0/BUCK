@@ -2,13 +2,13 @@ load("@bootstrap//:sysroot.bzl", "sysroot_from_http_archive")
 load("@bootstrap//:rust_toolchain_from_sysroot.bzl", "rust_toolchain_from_sysroot")
 
 # TODO(yxdai-nju): allow customizing target triple
+# TODO(yxdai-nju): support parsing '[rust]/src/stage0' for URLs and sha256 digests
 
 http_archive(
     name = "rust-std-beta",
     sha256 = "04e31482a3ff18d8fdff40c4e95b22bc667bc0dd1ba06fadbe2479bae5d97288",
     strip_prefix = "rust-std-beta-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu",
     urls = ["https://static.rust-lang.org/dist/2025-02-18/rust-std-beta-x86_64-unknown-linux-gnu.tar.xz"],
-    visibility = ["PUBLIC"],
 )
 
 http_archive(
@@ -16,7 +16,6 @@ http_archive(
     sha256 = "75a9d69d13e50bb22ec721f9c64d08282d76f285482b285bb61bacabeecd710c",
     strip_prefix = "rustc-beta-x86_64-unknown-linux-gnu/rustc",
     urls = ["https://static.rust-lang.org/dist/2025-02-18/rustc-beta-x86_64-unknown-linux-gnu.tar.xz"],
-    visibility = ["PUBLIC"],
 )
 
 http_archive(
@@ -24,7 +23,6 @@ http_archive(
     sha256 = "a8c569398d71cab0b90c809b1d869a2e3c5037407b5af804df08c205775981c2",
     strip_prefix = "cargo-beta-x86_64-unknown-linux-gnu/cargo",
     urls = ["https://static.rust-lang.org/dist/2025-02-18/cargo-beta-x86_64-unknown-linux-gnu.tar.xz"],
-    visibility = ["PUBLIC"],
 )
 
 sysroot_from_http_archive(
@@ -37,7 +35,7 @@ sysroot_from_http_archive(
 
 rust_toolchain_from_sysroot(
     name = "rust",
-    sysroot_path = ":sysroot",
+    sysroot = ":sysroot",
     default_edition = "2024",
     visibility = ["PUBLIC"],
 )

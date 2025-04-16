@@ -14,12 +14,10 @@ buckfile_imports = """
 load("@prelude//rust:cargo_buildscript.bzl", "buildscript_run")
 load(
     ":rule_macros.bzl",
-    "stdlib_rust_binary",
-    "stdlib_rust_library",
-    "add_configured_aliases",
+    "rbi_rust_binary",
+    "rbi_rust_library",
 )
-add_configured_aliases(platform = "bootstrap//platforms:rust_bootstrap_stage0")
 """
 
-rust_binary = "stdlib_rust_binary"
-rust_library = "stdlib_rust_library"
+rust_binary = "rbi_rust_binary"
+rust_library = "rbi_rust_library"

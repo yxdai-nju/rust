@@ -27,6 +27,10 @@ create_absolute_symlink "$BOOTSTRAP_BUCK2_PATH/library/src" "$BOOTSTRAP_BUCK2_PA
 create_absolute_symlink "$BOOTSTRAP_BUCK2_PATH/compiler/src" "$BOOTSTRAP_BUCK2_PATH/../../compiler"
 
 # Generate BUCK files for third-party dependencies
+echo "Generating BUCK file for internal tools..."
+reindeer --third-party-dir $BOOTSTRAP_BUCK2_PATH/bootstrap/tools/third-party buckify
+echo "Completed"
+
 echo "Generating BUCK file for library..."
 reindeer --third-party-dir $BOOTSTRAP_BUCK2_PATH/library buckify
 echo "Completed"

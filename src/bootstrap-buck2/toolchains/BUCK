@@ -1,36 +1,40 @@
 load("@prelude//toolchains:cxx.bzl", "system_cxx_toolchain")
-load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain")
-load("@bootstrap//:toolchain.bzl", "rust_bootstrap_toolchain")
+load("@prelude//toolchains:python.bzl", buck2_bootstrap_system_python_toolchain = "system_python_bootstrap_toolchain")
+load("@bootstrap//:toolchain.bzl", "buck2_bootstrap_stage0_rust_toolchain")
 
+# A Buck2 bootstrap toolchain (which uses system-installed Python)
+# for building Python-written Rust bootstrap internal tools (bootstrap//tools/...)
+buck2_bootstrap_system_python_toolchain(
+    name = "python_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+# A Buck2 bootstrap toolchain (which uses beta-channel Rust)
+# for building Rust-written Rust bootstrap internal tools (bootstrap//tools/...)
+buck2_bootstrap_stage0_rust_toolchain(
+    name = "rust_bootstrap",
+    visibility = ["PUBLIC"],
+)
+
+# C++ toolchain
 system_cxx_toolchain(
     name = "cxx",
     visibility = ["PUBLIC"],
 )
 
-system_python_bootstrap_toolchain(
-    name = "python_bootstrap",
-    visibility = ["PUBLIC"],
-)
-
-rust_bootstrap_toolchain(
-    name = "rust_bootstrap",
-    visibility = ["PUBLIC"],
-)
-
+# Rust toolchains
 toolchain_alias(
     name = "rust",
     actual = select({
-        "DEFAULT": ":rust_beta",
-        "bootstrap//constraints:use_beta": ":rust_beta",
-        # "bootstrap//constraints:use_stage0": ":rust_stage0",
-        # "bootstrap//constraints:use_stage1": ":rust_stage1",
-        # "bootstrap//constraints:use_stage1p": ":rust_stage1p",
-        # "bootstrap//constraints:use_stage2": ":rust_stage2",
+        "bootstrap//constraints:stage0": ":rust_bootstrap_stage0",
+        # "bootstrap//constraints:stage1": ":rust_bootstrap_stage1",
+        # "bootstrap//constraints:stage2": ":rust_bootstrap_stage2",
     }),
     visibility = ["PUBLIC"],
 )
 
-alias(
-    name = "rust_beta",
-    actual = "toolchains//rust-beta:rust",
+toolchain_alias(
+    name = "rust_bootstrap_stage0",
+    actual = "toolchains//rust_bootstrap_stage0:rust",
+    visibility = ["PUBLIC"],
 )
