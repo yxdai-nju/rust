@@ -1,6 +1,2 @@
-# Symlink to an absolute path
-src
-
-# Reindeer temporary files
-/.cargo/
-/target/
+# Copied '[rust]/compiler' source directory
+/src

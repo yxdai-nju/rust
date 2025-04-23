@@ -1,2 +1,5 @@
 ## Buck2
 /buck-out/
+
+## llvm-project
+/llvm-project/

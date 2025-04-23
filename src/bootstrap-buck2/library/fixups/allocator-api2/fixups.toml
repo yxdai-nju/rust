@@ -1,6 +1,4 @@
 extra_deps = [
     ":alloc-0.0.0",
     ":core-0.0.0",
-
-    ":compiler_builtins",
 ]
