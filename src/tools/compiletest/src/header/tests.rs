@@ -175,7 +175,6 @@ impl ConfigBuilder {
             self.host.as_deref().unwrap_or("x86_64-unknown-linux-gnu"),
             "--target",
             self.target.as_deref().unwrap_or("x86_64-unknown-linux-gnu"),
-            "--git-repository=",
             "--nightly-branch=",
             "--git-merge-commit-email=",
             "--minicore-path=",
@@ -939,4 +938,10 @@ fn test_supported_crate_types() {
         &config,
         "//@ needs-crate-type: bin, cdylib, dylib, lib, proc-macro, rlib, staticlib"
     ));
+}
+
+#[test]
+fn test_ignore_auxiliary() {
+    let config = cfg().build();
+    assert!(check_ignore(&config, "//@ ignore-auxiliary"));
 }

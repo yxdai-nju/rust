@@ -124,9 +124,7 @@ use unused::*;
 
 #[rustfmt::skip]
 pub use builtin::{MissingDoc, SoftLints};
-pub use context::{
-    CheckLintNameResult, EarlyContext, FindLintError, LateContext, LintContext, LintStore,
-};
+pub use context::{CheckLintNameResult, EarlyContext, LateContext, LintContext, LintStore};
 pub use early::{EarlyCheckNode, check_ast_node};
 pub use late::{check_crate, late_lint_mod, unerased_lint_store};
 pub use levels::LintLevelsBuilder;
@@ -609,6 +607,11 @@ fn register_builtins(store: &mut LintStore) {
         "undefined_naked_function_abi",
         "converted into hard error, see PR #139001 \
          <https://github.com/rust-lang/rust/issues/139001> for more information",
+    );
+    store.register_removed(
+        "abi_unsupported_vector_types",
+        "converted into hard error, \
+         see <https://github.com/rust-lang/rust/issues/116558> for more information",
     );
 }
 
